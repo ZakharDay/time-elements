@@ -7,9 +7,9 @@ TimeAgoPrototype.getFormattedDate = function() {
   if (this._date) {
     const format = this.getAttribute('format')
     if (format === 'micro') {
-      return new RelativeTime(this._date).microTimeAgo()
+      return new RelativeTime(this._date, this._locale).microTimeAgo()
     } else {
-      return new RelativeTime(this._date).timeAgo()
+      return new RelativeTime(this._date, this._locale).timeAgo()
     }
   }
 }

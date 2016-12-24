@@ -11,6 +11,12 @@ ExtendedTimePrototype.attributeChangedCallback = function(attrName, oldValue, ne
     this._date = isNaN(millis) ? null : new Date(millis)
   }
 
+  if (attrName === 'locale') {
+    this._locale = newValue
+  } else {
+    this._locale = 'en'
+  }
+
   const title = this.getFormattedTitle()
   if (title) {
     this.setAttribute('title', title)

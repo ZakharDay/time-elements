@@ -1,4 +1,5 @@
-import {strftime, makeFormatter, isDayFirst} from './utils'
+import {strftime} from './strftime'
+import {makeFormatter, isDayFirst} from './utils'
 import ExtendedTimePrototype from './extended-time-element'
 
 const LocalTimePrototype = Object.create(ExtendedTimePrototype)

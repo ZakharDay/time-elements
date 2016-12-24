@@ -4,15 +4,22 @@ import ExtendedTimePrototype from './extended-time-element'
 const RelativeTimePrototype = Object.create(ExtendedTimePrototype)
 
 RelativeTimePrototype.createdCallback = function() {
-  const value = this.getAttribute('datetime')
+  let value
+
+  value = this.getAttribute('datetime')
   if (value) {
     this.attributeChangedCallback('datetime', null, value)
+  }
+
+  value = this.getAttribute('locale')
+  if (value) {
+    this.attributeChangedCallback('locale', null, value)
   }
 }
 
 RelativeTimePrototype.getFormattedDate = function() {
   if (this._date) {
-    return new RelativeTime(this._date).toString()
+    return new RelativeTime(this._date, this._locale).toString()
   }
 }
 

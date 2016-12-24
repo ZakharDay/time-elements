@@ -1,20 +1,24 @@
-import {strftime, makeFormatter, isDayFirst, isThisYear, isYearSeparator} from './utils'
+import {strftime} from './strftime'
+import {makeFormatter, isDayFirst, isThisYear, isYearSeparator} from './utils'
+import * as RelativeTimeEN from './locales/relative-time.en'
+import * as RelativeTimeRU from './locales/relative-time.ru'
 
 export default class RelativeTime {
-  constructor(date) {
+  constructor(date, locale) {
     this.date = date
+    this.locale = locale
   }
 
   toString() {
     const ago = this.timeElapsed()
     if (ago) {
-      return ago
+      return this.timeAgoToString(ago)
     } else {
       const ahead = this.timeAhead()
       if (ahead) {
-        return ahead
+        return this.timeAheadToString(ahead)
       } else {
-        return 'on ' + this.formatDate()
+        return this.onDateToString(this.formatDate())
       }
     }
   }
@@ -51,38 +55,38 @@ export default class RelativeTime {
   }
 
   timeAgoFromMs(ms) {
-    const sec = Math.round(ms / 1000)
-    const min = Math.round(sec / 60)
-    const hr = Math.round(min / 60)
-    const day = Math.round(hr / 24)
-    const month = Math.round(day / 30)
-    const year = Math.round(month / 12)
-    if (ms < 0) {
-      return 'just now'
-    } else if (sec < 10) {
-      return 'just now'
-    } else if (sec < 45) {
-      return sec + ' seconds ago'
-    } else if (sec < 90) {
-      return 'a minute ago'
-    } else if (min < 45) {
-      return min + ' minutes ago'
-    } else if (min < 90) {
-      return 'an hour ago'
-    } else if (hr < 24) {
-      return hr + ' hours ago'
-    } else if (hr < 36) {
-      return 'a day ago'
-    } else if (day < 30) {
-      return day + ' days ago'
-    } else if (day < 45) {
-      return 'a month ago'
-    } else if (month < 12) {
-      return month + ' months ago'
-    } else if (month < 18) {
-      return 'a year ago'
+    const { locale } = this
+    if (locale === 'ru' || locale === 'RU' || locale === 'ru_RU') {
+      return RelativeTimeRU.timeAgoFromMs(ms)
     } else {
-      return year + ' years ago'
+      return RelativeTimeEN.timeAgoFromMs(ms)
+    }
+  }
+
+  timeAgoToString(ago) {
+    const { locale } = this
+    if (locale === 'ru' || locale === 'RU' || locale === 'ru_RU') {
+      return RelativeTimeRU.timeAgoToString(ago)
+    } else {
+      return RelativeTimeEN.timeAgoToString(ago)
+    }
+  }
+
+  timeAheadToString(ahead) {
+    const { locale } = this
+    if (locale === 'ru' || locale === 'RU' || locale === 'ru_RU') {
+      return RelativeTimeRU.timeAheadToString(ahead)
+    } else {
+      return RelativeTimeEN.timeAheadToString(ahead)
+    }
+  }
+
+  onDateToString(date) {
+    const { locale } = this
+    if (locale === 'ru' || locale === 'RU' || locale === 'ru_RU') {
+      return RelativeTimeRU.onDateToString(date)
+    } else {
+      return RelativeTimeEN.onDateToString(date)
     }
   }
 
@@ -113,36 +117,11 @@ export default class RelativeTime {
   }
 
   timeUntilFromMs(ms) {
-    const sec = Math.round(ms / 1000)
-    const min = Math.round(sec / 60)
-    const hr = Math.round(min / 60)
-    const day = Math.round(hr / 24)
-    const month = Math.round(day / 30)
-    const year = Math.round(month / 12)
-    if (month >= 18) {
-      return year + ' years from now'
-    } else if (month >= 12) {
-      return 'a year from now'
-    } else if (day >= 45) {
-      return month + ' months from now'
-    } else if (day >= 30) {
-      return 'a month from now'
-    } else if (hr >= 36) {
-      return day + ' days from now'
-    } else if (hr >= 24) {
-      return 'a day from now'
-    } else if (min >= 90) {
-      return hr + ' hours from now'
-    } else if (min >= 45) {
-      return 'an hour from now'
-    } else if (sec >= 90) {
-      return min + ' minutes from now'
-    } else if (sec >= 45) {
-      return 'a minute from now'
-    } else if (sec >= 10) {
-      return sec + ' seconds from now'
+    const { locale } = this
+    if (locale === 'ru' || locale === 'RU' || locale === 'ru_RU') {
+      return RelativeTimeRU.timeUntilFromMs(ms)
     } else {
-      return 'just now'
+      return RelativeTimeEN.timeUntilFromMs(ms)
     }
   }
 
@@ -168,11 +147,17 @@ export default class RelativeTime {
   }
 
   formatDate() {
-    let format = isDayFirst() ? '%e %b' : '%b %e'
+    const { locale } = this
+    let format
+    if (locale === 'ru' || locale === 'RU' || locale === 'ru_RU') {
+      format = isDayFirst() ? '%e %B' : '%B %e'
+    } else {
+      format = isDayFirst() ? '%e %b' : '%b %e'
+    }
     if (!isThisYear(this.date)) {
       format += isYearSeparator() ? ', %Y': ' %Y'
     }
-    return strftime(this.date, format)
+    return strftime(this.date, format, this.locale)
   }
 
   formatTime() {
@@ -180,7 +165,7 @@ export default class RelativeTime {
     if (formatter) {
       return formatter.format(this.date)
     } else {
-      return strftime(this.date, '%l:%M%P')
+      return strftime(this.date, '%l:%M%P', this.locale)
     }
   }
 }
